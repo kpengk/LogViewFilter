@@ -3,6 +3,7 @@
 #include "ui_MainWindow.h"
 
 #include <QButtonGroup>
+#include <QCoreApplication>
 #include <QDir>
 #include <QElapsedTimer>
 #include <QEvent>
@@ -19,7 +20,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
 
     // 读取上次文件对话框使用的目录
-    QSettings settings(QDir::homePath() + "/LogViewFilter.ini", QSettings::IniFormat);
+    QSettings settings(QCoreApplication::applicationDirPath() + "/LogViewFilter.ini", QSettings::IniFormat);
     lastOpenDir_ = settings.value("lastOpenDir").toString();
     lastSaveDir_ = settings.value("lastSaveDir").toString();
 
@@ -68,7 +69,7 @@ void MainWindow::onBrowseFile() {
 
     // 更新并持久化上次打开目录
     lastOpenDir_ = QFileInfo(path).path();
-    QSettings settings(QDir::homePath() + "/LogViewFilter.ini", QSettings::IniFormat);
+    QSettings settings(QCoreApplication::applicationDirPath() + "/LogViewFilter.ini", QSettings::IniFormat);
     settings.setValue("lastOpenDir", lastOpenDir_);
 }
 
@@ -139,7 +140,7 @@ void MainWindow::onSave() {
 
     // 更新并持久化上次保存目录
     lastSaveDir_ = QFileInfo(savePath).path();
-    QSettings settings(QDir::homePath() + "/LogViewFilter.ini", QSettings::IniFormat);
+    QSettings settings(QCoreApplication::applicationDirPath() + "/LogViewFilter.ini", QSettings::IniFormat);
     settings.setValue("lastSaveDir", lastSaveDir_);
 
     QFile file(savePath);
