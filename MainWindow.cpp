@@ -10,11 +10,17 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QMimeData>
+#include <QSettings>
 #include <QTextStream>
 #include <QUrl>
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
+
+    // 读取上次文件对话框使用的目录
+    QSettings settings(QDir::homePath() + "/LogViewFilter.ini", QSettings::IniFormat);
+    lastOpenDir_ = settings.value("lastOpenDir").toString();
+    lastSaveDir_ = settings.value("lastSaveDir").toString();
 
     // 将两个单选按钮归入同一互斥组（UI 文件中已经互斥，此处仅做保险）
     QButtonGroup* modeGroup = new QButtonGroup(this);

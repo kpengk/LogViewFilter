@@ -53,6 +53,10 @@ private:
 
     Ui::MainWindow* ui;
 
+    // 上次文件对话框使用的目录
+    QString lastOpenDir_;
+    QString lastSaveDir_;
+
     // 当前过滤结果（用于另存为）
     QStringList filtered_lines_;
 };
