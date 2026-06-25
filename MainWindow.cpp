@@ -23,6 +23,14 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), ui(new Ui::MainWi
     lastOpenDir_ = settings.value("lastOpenDir").toString();
     lastSaveDir_ = settings.value("lastSaveDir").toString();
 
+    // 边界：如果持久化目录已被删除，则回退到默认位置，避免对话框从不存在的路径启动
+    if (!lastOpenDir_.isEmpty() && !QDir(lastOpenDir_).exists()) {
+        lastOpenDir_.clear();
+    }
+    if (!lastSaveDir_.isEmpty() && !QDir(lastSaveDir_).exists()) {
+        lastSaveDir_.clear();
+    }
+
     // 将两个单选按钮归入同一互斥组（UI 文件中已经互斥，此处仅做保险）
     QButtonGroup* modeGroup = new QButtonGroup(this);
     modeGroup->addButton(ui->radio_contain);
@@ -117,8 +125,8 @@ void MainWindow::onSave() {
         return;
     }
 
-    // 构造保存对话框的默认路径：优先使用 lastSaveDir_，否则仅使用默认文件名
-    const QString defaultSavePath = lastSaveDir_.isEmpty()
+    // 构造保存对话框的默认路径：若 lastSaveDir_ 存在且有效，则使用其下的默认文件名；否则仅使用默认文件名
+    const QString defaultSavePath = (lastSaveDir_.isEmpty() || !QDir(lastSaveDir_).exists())
                                         ? QStringLiteral("filter_out.log")
                                         : QDir(lastSaveDir_).filePath(QStringLiteral("filter_out.log"));
 
