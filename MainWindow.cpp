@@ -8,6 +8,7 @@
 #include <QEvent>
 #include <QFile>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QMessageBox>
 #include <QMimeData>
 #include <QSettings>
@@ -48,11 +49,19 @@ MainWindow::~MainWindow() {
 
 void MainWindow::onBrowseFile() {
     const QString path = QFileDialog::getOpenFileName(
-        this, tr("选择日志文件"), QString(), tr("日志文件 (*.log *.txt *.out);;所有文件 (*.*)"));
+        this, tr("选择日志文件"), lastOpenDir_,
+        tr("日志文件 (*.log *.txt *.out);;所有文件 (*.*)"));
 
-    if (!path.isEmpty()) {
-        ui->lineEdit_filePath->setText(path);
+    if (path.isEmpty()) {
+        return;
     }
+
+    ui->lineEdit_filePath->setText(path);
+
+    // 更新并持久化上次打开目录
+    lastOpenDir_ = QFileInfo(path).path();
+    QSettings settings(QDir::homePath() + "/LogViewFilter.ini", QSettings::IniFormat);
+    settings.setValue("lastOpenDir", lastOpenDir_);
 }
 
 void MainWindow::onFilter() {
