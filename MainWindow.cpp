@@ -117,12 +117,22 @@ void MainWindow::onSave() {
         return;
     }
 
+    // 构造保存对话框的默认路径：优先使用 lastSaveDir_，否则仅使用默认文件名
+    const QString defaultSavePath = lastSaveDir_.isEmpty()
+                                        ? QStringLiteral("filter_out.log")
+                                        : QDir(lastSaveDir_).filePath(QStringLiteral("filter_out.log"));
+
     const QString savePath = QFileDialog::getSaveFileName(
-        this, tr("保存过滤结果"), QStringLiteral("filter_out.log"), tr("日志文件 (*.log *.txt);;所有文件 (*.*)"));
+        this, tr("保存过滤结果"), defaultSavePath, tr("日志文件 (*.log *.txt);;所有文件 (*.*)"));
 
     if (savePath.isEmpty()) {
         return;
     }
+
+    // 更新并持久化上次保存目录
+    lastSaveDir_ = QFileInfo(savePath).path();
+    QSettings settings(QDir::homePath() + "/LogViewFilter.ini", QSettings::IniFormat);
+    settings.setValue("lastSaveDir", lastSaveDir_);
 
     QFile file(savePath);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
